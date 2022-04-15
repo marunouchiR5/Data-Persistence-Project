@@ -1,8 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Random = UnityEngine.Random;
 
 public class MainManager : MonoBehaviour
 {
@@ -12,6 +16,7 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+    public Text BestScoreText;
     
     private bool m_Started = false;
     private int m_Points;
@@ -36,6 +41,9 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+        
+        // Modify the upper text with best score and its owner's name
+        BestScoreText.text = "Best Score : " + GameManager.Instance.Name + " : " + GameManager.Instance.Score;
     }
 
     private void Update()
@@ -55,6 +63,15 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+            if (m_Points > GameManager.Instance.Score)
+            {
+                GameManager.Instance.Name = GameManager.Instance.PlayerName;
+                GameManager.Instance.Score = m_Points;
+                BestScoreText.text = "Best Score : " + GameManager.Instance.Name + " : " + GameManager.Instance.Score;
+                
+                GameManager.Instance.SaveBestScore();
+            }
+            
             if (Input.GetKeyDown(KeyCode.Space))
             {
                 SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
